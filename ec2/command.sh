@@ -11,3 +11,10 @@ function serverlist() {
   fi
   describe-instances ${EXEC_TYPE_STDOUT} "${OUTPUT_TYPE_TABLE}" "${query}" "${filter}" ""
 }
+
+function get_my_instance_name() {
+  local instance_id=$(get_my_instance_id)
+  local query="Tags[*].Value"
+  local filter="Name=key,Values=Name Name=resource-id,Values=${instance_id}"
+  echo $(describe-tags ${EXEC_TYPE_RESULT} "${OUTPUT_TYPE_TEXT}" "${query}" "${filter}" "")
+}

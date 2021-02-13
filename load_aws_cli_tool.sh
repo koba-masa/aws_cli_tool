@@ -1,4 +1,4 @@
-#!bin/bash -x
+#!bin/bash
 function_type=""
 function_name=""
 function_args=""
