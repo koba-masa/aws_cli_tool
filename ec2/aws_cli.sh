@@ -15,7 +15,7 @@ function describe-instances() {
     local query=""
     test "$3" != "" && query="--query $3" || query=""
     local filter=""
-    test "$4" != "" && filter="--filter $3" || filter=""
+    test "$4" != "" && filter="--filters $3" || filter=""
     local profile=""
     test "$5" != "" && profile=$5 || profile="${PROFILE_DEFAULT}"
 
