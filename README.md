@@ -2,13 +2,20 @@
 
 # 概要
 # コマンドリスト
-以下の形式にてaliasとして登録してください。
-- `alias <エイリアス名>='bash <本プロジェクトを配置したディレクトリ>/aws_cli_tool/load_aws_cli_tool.sh <AWSサービス名> <コマンド> <オプション>'`
-   - 例) `alias serverlist='bash /home/my_user/aws_cli_tool/load_aws_cli_tool.sh ec2 serverlist --vpc'`
+## 実行コマンド
+`bash <本プロジェクトを配置したディレクトリ>/aws_cli_tool/load_aws_cli_tool.sh <AWSサービス名> <コマンド> <オプション>`
 
-| 概要 | AWSサービス名 | コマンド | オプション |
-| :-- | :-- | :-- | :-- |
-| EC2インスタンスの一覧を表示する | ec2 | serverlist |  |
-| 同一VPC上に存在するEC2インスタンスの一覧を表示する | ec2 | serverlist | --vpc |
-| 自身のNameタグの値を取得する | ec2 | get_my_instance_name |  |
-|  |  |  |  |
+### 推奨
+- 以下の形式にてaliasとして登録することを推奨します。
+   - `alias aws_cli_tool='bash <本プロジェクトを配置したディレクトリ>/aws_cli_tool/load_aws_cli_tool.sh'`
+      - 上記の場合の実行コマンド：`aws_cli_tool <AWSサービス名> <コマンド> <オプション>`
+         - 例：`aws_cli_tool ec2 serverlist --vpc --with-status`
+
+## オプション
+| AWSサービス名 | コマンド | 概要 | オプション | オプション説明 |
+| :-- | :-- | :-- | :-- | :-- |
+| ec2 | serverlist | EC2インスタンスの一覧を表示する<br>Nameタグ・プライベートIPアドレス | --vpc | 同一VPC上に存在するEC2インスタンスを対象とする |
+|  |  |  | --with-status | 以下を追加で表示する<br>ステータス・起動時刻 |
+|  |  |  | --sort | 表示項目をソートする |
+|  | get_my_instance_name | 自身のNameタグの値を取得する | | |
+|  |  |  |  |  |
