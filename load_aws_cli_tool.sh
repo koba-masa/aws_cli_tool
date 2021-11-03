@@ -9,7 +9,7 @@ fi
 function_type=$1
 function_name=$2
 if [ $# -ge 3 ]; then
-  function_args=(${@:3:$#})
+  function_args=(${@:3})
 fi
 
 base_dir=$(cd "$( dirname "$0" )" && pwd -P)
@@ -29,6 +29,6 @@ if [ "${command_type}" != "function" ]; then
   exit 99
 fi
 
-${function_name} ${function_args}
+${function_name} ${function_args[@]}
 
 exit 0
