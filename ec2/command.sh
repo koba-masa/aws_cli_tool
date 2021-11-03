@@ -3,29 +3,39 @@
 source $(cd "$( dirname "$0" )" && pwd -P)/ec2/aws_cli.sh
 source $(cd "$( dirname "$0" )" && pwd -P)/ec2/utility.sh
 
+SORT_OFF=0
+SORT_ON=1
+
 function serverlist() {
   local query="Reservations[*].Instances[*].{ServerName:Tags[?Key=='Name']|[0].Value,PrivateIpAddress:PrivateIpAddress}"
   local filter=""
+  local output_type="${OUTPUT_TYPE_TABLE}"
+  local sorted=${SORT_OFF}
+  local sorted_item=".ServerName, .PrivateIpAddress"
   for option in "$@"
   do
     case ${option} in
       "--vpc")
         filter="Name=vpc-id,Values=$(get_my_vpc_id)"
         ;;
+      "--with-status")
+        query="Reservations[*].Instances[*].{ServerName:Tags[?Key=='Name']|[0].Value,PrivateIpAddress:PrivateIpAddress,Status:State.Name,LaunchTime:LaunchTime}"
+        sorted_item=".ServerName, .PrivateIpAddress, .Status, .LaunchTime"
+        ;;
+      "--sort")
+        output_type="${OUTPUT_TYPE_JSON}"
+        sorted=${SORT_ON}
+        ;;
     esac
   done
-  describe-instances ${EXEC_TYPE_STDOUT} "${OUTPUT_TYPE_TABLE}" "${query}" "${filter}" ""
-}
-
-function serverlist_with_status() {
-  local query="Reservations[*].Instances[*].{ServerName:Tags[?Key=='Name']|[0].Value,PrivateIpAddress:PrivateIpAddress,Status:State.Name,LaunchTime:LaunchTime}"
-  local filter=""
-  if [ "$1" == "--vpc" ]; then
-    filter="Name=vpc-id,Values=$(get_my_vpc_id)"
+  if [ ${sorted} -eq ${SORT_ON} ]; then
+    # TODO: 標準出力モードではないので、いつか修正する
+    local result_json=`describe-instances ${EXEC_TYPE_STDOUT} "${output_type}" "${query}" "${filter}" ""`
+    local processed_result=`echo ${result_json} | jq '.[][]|[.ServerName, .PrivateIpAddress, .Status, .LaunchTime] | @tsv' | sed -e 's/\"//g'`
+    echo -e "ServerName\tPrivateIpAddress\tStatus\tLaunchTime\n${processed_result}" | column -t
+  else
+    describe-instances ${EXEC_TYPE_STDOUT} "${output_type}" "${query}" "${filter}" ""
   fi
-  local result_json=`describe-instances ${EXEC_TYPE_STDOUT} "${OUTPUT_TYPE_JSON}" "${query}" "${filter}" ""`
-  local processed_result=`echo ${result_json} | jq '.[][]|[.ServerName, .PrivateIpAddress, .Status, .LaunchTime] | @tsv' | sed -e 's/\"//g'`
-  echo -e "ServerName\tPrivateIpAddress\tStatus\tLaunchTime\n${processed_result}" | column -t
 }
 
 function get_my_instance_name() {
