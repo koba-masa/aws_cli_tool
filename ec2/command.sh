@@ -6,9 +6,14 @@ source $(cd "$( dirname "$0" )" && pwd -P)/ec2/utility.sh
 function serverlist() {
   local query="Reservations[*].Instances[*].{ServerName:Tags[?Key=='Name']|[0].Value,PrivateIpAddress:PrivateIpAddress}"
   local filter=""
-  if [ "$1" == "--vpc" ]; then
-    filter="Name=vpc-id,Values=$(get_my_vpc_id)"
-  fi
+  for option in "$@"
+  do
+    case ${option} in
+      "--vpc")
+        filter="Name=vpc-id,Values=$(get_my_vpc_id)"
+        ;;
+    esac
+  done
   describe-instances ${EXEC_TYPE_STDOUT} "${OUTPUT_TYPE_TABLE}" "${query}" "${filter}" ""
 }
 
