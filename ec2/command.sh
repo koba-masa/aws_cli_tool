@@ -7,7 +7,7 @@ SORT_OFF=0
 SORT_ON=1
 
 function serverlist() {
-  local query="Reservations[*].Instances[*].{ServerName:Tags[?Key=='Name']|[0].Value,PrivateIpAddress:PrivateIpAddress}"
+  local query="sort_by(Reservations[*].Instances[*].{ServerName:Tags[?Key=='Name']|[0].Value,PrivateIpAddress:PrivateIpAddress}[],&ServerName)"
   local filter=""
   local output_type="${OUTPUT_TYPE_TABLE}"
   local sorted=${SORT_OFF}
@@ -19,7 +19,7 @@ function serverlist() {
         filter="Name=vpc-id,Values=$(get_my_vpc_id)"
         ;;
       "--with-status")
-        query="Reservations[*].Instances[*].{ServerName:Tags[?Key=='Name']|[0].Value,PrivateIpAddress:PrivateIpAddress,Status:State.Name,LaunchTime:LaunchTime}"
+        query="sort_by(Reservations[*].Instances[*].{ServerName:Tags[?Key=='Name']|[0].Value,PrivateIpAddress:PrivateIpAddress,Status:State.Name,LaunchTime:LaunchTime}[],&ServerName)"
         sorted_item=".ServerName, .PrivateIpAddress, .Status, .LaunchTime"
         ;;
       "--sort")
@@ -31,7 +31,7 @@ function serverlist() {
   if [ ${sorted} -eq ${SORT_ON} ]; then
     # TODO: 標準出力モードではないので、いつか修正する
     local result_json=`describe-instances ${EXEC_TYPE_STDOUT} "${output_type}" "${query}" "${filter}" ""`
-    local processed_result=`echo ${result_json} | jq '.[][]|[.ServerName, .PrivateIpAddress, .Status, .LaunchTime] | @tsv' | sed -e 's/\"//g'`
+    local processed_result=`echo ${result_json} | jq '.[]|[.ServerName, .PrivateIpAddress, .Status, .LaunchTime] | @tsv' | sed -e 's/\"//g'`
     echo -e "ServerName\tPrivateIpAddress\tStatus\tLaunchTime\n${processed_result}" | column -t
   else
     describe-instances ${EXEC_TYPE_STDOUT} "${output_type}" "${query}" "${filter}" ""
