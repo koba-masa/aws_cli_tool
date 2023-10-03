@@ -18,4 +18,5 @@
 |  |  |  | --with-status | 以下を追加で表示する<br>ステータス・起動時刻 |
 |  |  |  | --sort | 表示項目をソートする |
 |  | get_my_instance_name | 自身のNameタグの値を取得する | | |
+| cli | command_list | awsコマンドの`command`と`subcommand`の一覧を表示する | --reload | キャッシュファイルを削除する |
 |  |  |  |  |  |

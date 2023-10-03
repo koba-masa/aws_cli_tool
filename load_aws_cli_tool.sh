@@ -1,4 +1,5 @@
 #!bin/bash
+
 function_type=""
 function_name=""
 function_args=""
@@ -16,6 +17,9 @@ base_dir=$(cd "$( dirname "$0" )" && pwd -P)
 case "${function_type}" in
   "ec2")
     source ${base_dir}/ec2/command.sh
+    ;;
+  "cli")
+    source ${base_dir}/cli/command.sh
     ;;
   *)
     echo "[ERROR] This function type('${function_type}') is not defined."
